@@ -19,9 +19,9 @@ on:
         required: false
         default: 'false'
       commit:
-        description: 'coolsnowwolf/lede branch or commit'
+        description: 'coolsnowwolf/lede master commit'
         required: false
-        default: 'master'
+        default: 'false'
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
@@ -62,8 +62,15 @@ jobs:
       working-directory: /workdir
       run: |
         df -hT $PWD
-        git clone $REPO_URL -b ${{ github.event.inputs.commit }} openwrt
+        git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+        
+    - name: change to commit
+      if: github.event.inputs.commit  != 'false'
+      run: |
+        cd openwrt
+        git reset --hard ${{ github.event.inputs.commit }}
+ 
 
     - name: Load custom feeds
       run: |
