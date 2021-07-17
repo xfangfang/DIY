@@ -18,6 +18,10 @@ on:
         description: 'SSH connection to Actions'
         required: false
         default: 'false'
+      commit:
+        description: 'coolsnowwolf/lede branch or commit'
+        required: false
+        default: 'master'
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
@@ -58,7 +62,7 @@ jobs:
       working-directory: /workdir
       run: |
         df -hT $PWD
-        git clone $REPO_URL -b $REPO_BRANCH openwrt
+        git clone $REPO_URL -b ${{ github.event.inputs.commit }} openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
     - name: Load custom feeds
