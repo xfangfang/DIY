@@ -89,6 +89,9 @@ jobs:
         with:
           repository: 'xfangfang/wiliwili'
           submodules: 'recursive'
+        
+      - name: Install dependency
+          
           
       - name: Install dependency
         uses: msys2/setup-msys2@v2
@@ -114,8 +117,12 @@ jobs:
           mkdir -p build && pushd build
           cmake .. -G "MinGW Makefiles" -DPLATFORM_DESKTOP=ON -DWIN32_TERMINAL=OFF -DCMAKE_BUILD_TYPE=Release
           mingw32-make wiliwili -j10
+          mkdir wiliwili && mv wiliwili.exe wiliwili && mv -r resources wiliwili
+          for i in {libwinpthread-1,libgcc_s_seh-1,zlib1,libssh2-1,glfw3,libstdc++-6,libcrypto-1_1-x64,mpv-1}; do
+          cp /mingw64/bin/${i}.dll wiliwili2
+          done
           popd
-          cp build/wiliwili.exe $DIST_EXE
+          cp -r build/wiliwili $DIST_EXE
           echo "::set-output name=status::success"
           
       - name: Upload dist
