@@ -89,7 +89,8 @@ jobs:
         with:
           repository: 'xfangfang/wiliwili'
           
-      - uses: msys2/setup-msys2@v2
+      - name: Install dependency
+        uses: msys2/setup-msys2@v2
         with:
           update: true
           install: >-
@@ -101,15 +102,16 @@ jobs:
             mingw-w64-x86_64-mpv
             git
 
-      - shell: msys2 {0}
+      - name: Build
+        shell: msys2 {0}
         id: compile
         run: |
-          $VERSION="${{ needs.version.outputs.version }}"
-          $DIST_EXE="${{ needs.version.outputs.DIST_EXE }}"
+          VERSION="${{ needs.version.outputs.version }}"
+          DIST_EXE="${{ needs.version.outputs.DIST_EXE }}"
           echo ${VERSION} ${DIST_EXE}
           
           mkdir -p build && pushd build
-          cmake -G "MinGW Makefiles" -DPLATFORM_DESKTOP=ON -DWIN32_TERMINAL=OFF -DCMAKE_BUILD_TYPE=Release ..
+          cmake .. -G "MinGW Makefiles" -DPLATFORM_DESKTOP=ON -DWIN32_TERMINAL=OFF -DCMAKE_BUILD_TYPE=Release
           mingw32-make wiliwili -j10
           popd
           cp build/wiliwili.exe $DIST_EXE
