@@ -44,7 +44,7 @@ jobs:
       - name: Release version
         if: github.event.inputs.release == 'true' && github.event.inputs.release != 'false' && !cancelled()
         run: |
-          export VERSION=`python3 -c "exec(open('macast/__pkginfo__.py').read()); print(__version__)"`
+          export VERSION="${{ github.event.inputs.version }}"
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
       - name: Version
         id: info
@@ -52,9 +52,9 @@ jobs:
           VERSION: ${{ env.VERSION }}
         run: |
           echo "::set-output name=version::${VERSION}"
-          echo "::set-output name=DIST_EXE::wiliwili-Windows-${VERSION}-x64.exe"
+          echo "::set-output name=DIST_EXE::wiliwili-Windows-x64-${VERSION}"
           echo $VERSION
-          echo ${{  github.event.inputs.version }}
+          echo "${{  github.event.inputs.version }}"
   release:
     needs: [ build-win-x64, version ]
     runs-on: ubuntu-latest
@@ -78,7 +78,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           allowUpdates: true
           artifacts: >
-            ${{ env.DIST_EXE }}/${{ env.DIST_EXE }},
+            ${{ env.DIST_EXE }}/${{ env.DIST_EXE }}.tar.gz,
 
   build-win-x64:
     needs: [ version ]
@@ -125,8 +125,7 @@ jobs:
           wget https://github.com/xfangfang/wiliwili/releases/download/v0.1.0/mpv-dev-x86_64-v3-20220904-git-d433c5d.7z -O mpv.7z
           7z e mpv.7z -ompv
           cp mpv/mpv-2.dll wiliwili/mpv-1.dll
-          popd
-          cp -r build/wiliwili $DIST_EXE
+          tar -czvf ../${DIST_EXE}.tar.gz wiliwili
           echo "::set-output name=status::success"
           
       - name: Upload dist
@@ -134,5 +133,5 @@ jobs:
         if: steps.compile.outputs.status == 'success'
         with:
           name: ${{ needs.version.outputs.DIST_EXE }}
-          path: ${{ needs.version.outputs.DIST_EXE }}
+          path: "${{ needs.version.outputs.DIST_EXE }}.tar.gz"
 
