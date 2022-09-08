@@ -78,7 +78,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           allowUpdates: true
           artifacts: >
-            ${{ env.DIST_EXE }}/${{ env.DIST_EXE }}.tar.gz,
+            ${{ env.DIST_EXE }}/${{ env.DIST_EXE }}.tar.gz
 
   build-win-x64:
     needs: [ version ]
