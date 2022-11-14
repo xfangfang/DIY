@@ -104,6 +104,8 @@ jobs:
           DIST_DMG: ${{ needs.version.outputs.DIST_INTEL_DMG }}
         run: |
           echo $VERSION DIST_INTEL_DMG
+          export LDFLAGS="${LDFLAGS} -L/usr/local/opt/mpv-wiliwili/lib"
+          export CPPFLAGS="${CPPFLAGS} -I/usr/local/opt/mpv-wiliwili/include"
           bash ./scripts/build_mac.sh
           create-dmg --window-pos 200 120 --window-size 800 400 \
             --icon-size 100 --icon "wiliwili.app" 200 190 \
