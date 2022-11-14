@@ -71,13 +71,6 @@ jobs:
         with:
           repository: 'xfangfang/wiliwili'
           submodules: 'recursive'
-          
-      - name: SSH connection to Actions
-        uses: P3TERX/ssh2actions@v1.0.0
-        if: (github.event.inputs.ssh_darwin == 'true' && github.event.inputs.ssh_darwin  != 'false') || contains(github.event.action, 'ssh_darwin')
-        env:
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
       - name: install deps
         run: |
@@ -97,6 +90,13 @@ jobs:
           echo "Please run this command in your terminal:" >> dist/readme.txt
           echo "sudo xattr -rd com.apple.quarantine /Applications/wiliwili.app" >> dist/readme.txt
 
+      - name: SSH connection to Actions
+        uses: P3TERX/ssh2actions@v1.0.0
+        if: (github.event.inputs.ssh_darwin == 'true' && github.event.inputs.ssh_darwin  != 'false') || contains(github.event.action, 'ssh_darwin')
+        env:
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+
       - name: Build
         id: compile
         env:
@@ -104,14 +104,13 @@ jobs:
           DIST_DMG: ${{ needs.version.outputs.DIST_INTEL_DMG }}
         run: |
           echo $VERSION DIST_INTEL_DMG
-          export LDFLAGS="${LDFLAGS} -L/usr/local/opt/mpv-wiliwili/lib"
-          export CPPFLAGS="${CPPFLAGS} -I/usr/local/opt/mpv-wiliwili/include"
-          bash ./scripts/build_mac.sh
+          cmake -B build -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release
+          make -C build wiliwili.app -j$(nproc)
           create-dmg --window-pos 200 120 --window-size 800 400 \
             --icon-size 100 --icon "wiliwili.app" 200 190 \
             --icon "readme.txt" 400 100 --hide-extension "wiliwili.app" \
             --app-drop-link 600 185  --volicon ./scripts/mac/dmg.icns \
-            --volname "wiliwili-v${VERSION} Installer" ${DIST_INTEL_DMG}.dmg "cmake-build-mac/"
+            --volname "wiliwili-v${VERSION} Installer" ${DIST_INTEL_DMG}.dmg "build/"
           echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Upload dist
