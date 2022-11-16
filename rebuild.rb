@@ -81,7 +81,7 @@ begin
   fetch "mpv-wiliwili"
   print "\n#{total} fetched\n"
   fetch "glfw"
-  install glfw
+  install "glfw"
 
   if $compile_deps
     print "#{total} packages to be compiled\n"
