@@ -90,7 +90,7 @@ jobs:
           brew developer on
           brew install create-dmg dylibbundler glm sd
           echo $PWD
-          ls
+          wget https://github.com/xfangfang/OpenWrt-DIY/raw/main/rebuild.rb
           chmod +x ./rebuild.rb
           ./rebuild.rb
 
