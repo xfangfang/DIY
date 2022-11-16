@@ -93,7 +93,7 @@ jobs:
         run: |
           brew tap xfangfang/wiliwili
           brew developer on
-          brew install create-dmg dylibbundler glm
+          brew install create-dmg dylibbundler glm sd
           echo $PWD
           chmod +x ./rebuild.rb
           ./rebulid.rb
