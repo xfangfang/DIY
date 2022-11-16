@@ -89,12 +89,14 @@ jobs:
           restore-keys: ${{ runner.os }}-wiliwili-
 
       - name: install deps
+        shell: zsh {0}
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         run: |
           brew tap xfangfang/wiliwili
           brew developer on
           brew install create-dmg dylibbundler glm sd
           echo $PWD
+          ls
           chmod +x ./rebuild.rb
           ./rebuild.rb
 
