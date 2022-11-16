@@ -3,7 +3,7 @@ name: Build wiliwili
 on:
   push:
     branches:
-      - yoga
+      - main
   pull_request:
   workflow_dispatch:
     inputs:
@@ -72,11 +72,31 @@ jobs:
           repository: 'xfangfang/wiliwili'
           submodules: 'recursive'
 
+      - name: SSH connection to Actions
+        uses: P3TERX/ssh2actions@v1.0.0
+        if: (github.event.inputs.ssh_darwin == 'true' && github.event.inputs.ssh_darwin  != 'false') || contains(github.event.action, 'ssh_darwin')
+        env:
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+
+      - name: cache deps
+        id: cache
+        uses: actions/cache@v1
+        with:
+          path: |
+            /usr/local/opt/
+          key: ${{ runner.os }}-wiliwili-r1
+          restore-keys: ${{ runner.os }}-wiliwili-
+
       - name: install deps
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         run: |
-          brew install create-dmg dylibbundler glfw glm
           brew tap xfangfang/wiliwili
-          brew install mpv-wiliwili
+          brew developer on
+          brew install create-dmg dylibbundler glm
+          echo $PWD
+          chmod +x ./rebuild.rb
+          ./rebulid.rb
 
       - name: Readme
         run: |
@@ -90,31 +110,25 @@ jobs:
           echo "Please run this command in your terminal:" >> dist/readme.txt
           echo "sudo xattr -rd com.apple.quarantine /Applications/wiliwili.app" >> dist/readme.txt
 
-      - name: SSH connection to Actions
-        uses: P3TERX/ssh2actions@v1.0.0
-        if: (github.event.inputs.ssh_darwin == 'true' && github.event.inputs.ssh_darwin  != 'false') || contains(github.event.action, 'ssh_darwin')
-        env:
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-
       - name: Build
         id: compile
         env:
           VERSION: ${{ needs.version.outputs.version }}
-          DIST_DMG: ${{ needs.version.outputs.DIST_INTEL_DMG }}
+          DIST_INTEL_DMG: ${{ needs.version.outputs.DIST_INTEL_DMG }}
         run: |
-          echo $VERSION DIST_INTEL_DMG
+          echo $VERSION $DIST_INTEL_DMG
           cmake -B build -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release
           make -C build wiliwili.app -j$(nproc)
+          mv build/wiliwili.app dist/
           create-dmg --window-pos 200 120 --window-size 800 400 \
             --icon-size 100 --icon "wiliwili.app" 200 190 \
             --icon "readme.txt" 400 100 --hide-extension "wiliwili.app" \
             --app-drop-link 600 185  --volicon ./scripts/mac/dmg.icns \
-            --volname "wiliwili-v${VERSION} Installer" ${DIST_INTEL_DMG}.dmg "build/"
+            --volname "wiliwili (${VERSION})" ${DIST_INTEL_DMG}.dmg "dist/"
           echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Upload dist
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: steps.compile.outputs.status == 'success'
         with:
           name: ${{ needs.version.outputs.DIST_INTEL_DMG }}
