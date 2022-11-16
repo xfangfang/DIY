@@ -81,7 +81,7 @@ jobs:
 
       - name: cache deps
         id: cache
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: |
             /usr/local/opt/
@@ -96,7 +96,7 @@ jobs:
           brew install create-dmg dylibbundler glm sd
           echo $PWD
           chmod +x ./rebuild.rb
-          ./rebulid.rb
+          ./rebuild.rb
 
       - name: Readme
         run: |
