@@ -70,7 +70,7 @@ jobs:
         id: cache
         uses: actions/cache@v3
         with:
-          path: $(brew --prefix)
+          path: /usr/local
           key: ${{ runner.os }}-wiliwili-r3
 
       - name: install deps
