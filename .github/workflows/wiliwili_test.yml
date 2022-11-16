@@ -66,12 +66,6 @@ jobs:
     needs: [ version ]
     runs-on: macos-11
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          repository: 'xfangfang/wiliwili'
-          submodules: 'recursive'
-
       - name: SSH connection to Actions
         uses: P3TERX/ssh2actions@v1.0.0
         if: (github.event.inputs.ssh_darwin == 'true' && github.event.inputs.ssh_darwin  != 'false') || contains(github.event.action, 'ssh_darwin')
@@ -99,6 +93,12 @@ jobs:
           ls
           chmod +x ./rebuild.rb
           ./rebuild.rb
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: 'xfangfang/wiliwili'
+          submodules: 'recursive'
 
       - name: Readme
         run: |
