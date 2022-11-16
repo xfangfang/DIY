@@ -70,14 +70,8 @@ jobs:
         id: cache
         uses: actions/cache@v3
         with:
-          path: |
-            /usr/local/Homebrew
-            /usr/local/Cellar
-            /usr/local/Frameworks
-            /usr/local/bin
-            /usr/local/opt
-          key: ${{ runner.os }}-wiliwili-r2
-          restore-keys: ${{ runner.os }}-wiliwili-
+          path: $(brew --prefix)
+          key: ${{ runner.os }}-wiliwili-r3
 
       - name: install deps
         shell: zsh {0}
@@ -87,7 +81,9 @@ jobs:
           brew developer on
           brew install create-dmg dylibbundler glm sd
           echo $PWD
+          wget https://github.com/xfangfang/OpenWrt-DIY/raw/main/homebrew_x86.patch
           wget https://github.com/xfangfang/OpenWrt-DIY/raw/main/rebuild.rb
+          ls
           chmod +x ./rebuild.rb
           ./rebuild.rb
 
