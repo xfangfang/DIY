@@ -71,8 +71,12 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            /usr/local/opt/
-          key: ${{ runner.os }}-wiliwili-r1
+            /usr/local/Homebrew
+            /usr/local/Cellar
+            /usr/local/Frameworks
+            /usr/local/bin
+            /usr/local/opt
+          key: ${{ runner.os }}-wiliwili-r2
           restore-keys: ${{ runner.os }}-wiliwili-
 
       - name: install deps
