@@ -76,7 +76,9 @@ jobs:
             /usr/local/Frameworks
             /usr/local/bin
             /usr/local/opt
-          key: ${{ runner.os }}-wiliwili-r4
+            /usr/local/lib/pkgconfig
+            /usr/local/lib/cmake
+          key: ${{ runner.os }}-wiliwili-r5
 
       - name: install deps
         shell: zsh {0}
@@ -124,7 +126,6 @@ jobs:
           DIST_INTEL_DMG: ${{ needs.version.outputs.DIST_INTEL_DMG }}
         run: |
           echo $VERSION $DIST_INTEL_DMG
-          export PKG_CONFIG_PATH=$(find /usr/local/Cellar -name 'pkgconfig' -type d | grep lib/pkgconfig | tr '\n' ':' | sed s/.$//)
           cmake -B build -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release -DMAC_10_15=ON
           make -C build wiliwili.app -j$(nproc)
           mv build/wiliwili.app dist/
