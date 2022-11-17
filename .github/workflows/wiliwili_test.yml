@@ -66,6 +66,12 @@ jobs:
     needs: [ version ]
     runs-on: macos-11
     steps:
+    
+      - name: install base dep
+        run: |
+          brew tap xfangfang/wiliwili
+          brew install glm glfw mpv-wiliwili
+
       - name: cache deps
         id: cache
         uses: actions/cache@v3
@@ -77,8 +83,7 @@ jobs:
             /usr/local/bin
             /usr/local/opt
             /usr/local/lib
-            /usr/local/include
-          key: ${{ runner.os }}-wiliwili-r7
+          key: ${{ runner.os }}-wiliwili-r6
 
       - name: install deps
         shell: zsh {0}
