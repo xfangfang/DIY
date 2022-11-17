@@ -70,8 +70,13 @@ jobs:
         id: cache
         uses: actions/cache@v3
         with:
-          path: /usr/local
-          key: ${{ runner.os }}-wiliwili-r3
+          path: |
+            /usr/local/Homebrew
+            /usr/local/Cellar
+            /usr/local/Frameworks
+            /usr/local/bin
+            /usr/local/opt
+          key: ${{ runner.os }}-wiliwili-r4
 
       - name: install deps
         shell: zsh {0}
