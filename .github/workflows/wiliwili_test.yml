@@ -76,9 +76,8 @@ jobs:
             /usr/local/Frameworks
             /usr/local/bin
             /usr/local/opt
-            /usr/local/lib/pkgconfig
-            /usr/local/lib/cmake
-          key: ${{ runner.os }}-wiliwili-r5
+            /usr/local/lib/
+          key: ${{ runner.os }}-wiliwili-r6
 
       - name: install deps
         shell: zsh {0}
