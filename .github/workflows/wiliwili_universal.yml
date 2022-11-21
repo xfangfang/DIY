@@ -131,7 +131,7 @@ jobs:
           DIST_INTEL_DMG: ${{ needs.version.outputs.DIST_INTEL_DMG }}
         run: |
           echo $VERSION $DIST_INTEL_DMG
-          cmake -B build -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release -DMAC_10_15=ON -DMAC_UNIVERSAL=ON
+          cmake -B build -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
           make -C build wiliwili.app -j$(nproc)
           mv build/wiliwili.app dist/
           create-dmg --window-pos 200 120 --window-size 800 400 \
