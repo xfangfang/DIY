@@ -9,11 +9,7 @@ $only_setup = $*.find_index("--setup-env")
 $patch_python = $*.find_index("--patch-python")
 
 arch = %x[arch].chomp
-$homebrew_patch = if arch == "arm64"
-                    "homebrew_arm.patch"
-                  else
-                    "homebrew_x86.patch"
-                  end
+$homebrew_patch = "homebrew_x86_universal.patch"
 $current_dir = "#{`pwd`.chomp}"
 $homebrew_path = "#{`brew --repository`.chomp}/"
 
