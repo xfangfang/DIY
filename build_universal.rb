@@ -8,7 +8,7 @@ $compile_deps = !$*.find_index("--no-deps")
 $only_setup = $*.find_index("--setup-env")
 $patch_python = $*.find_index("--patch-python")
 
-arch = %x[arch].chomp
+arcbih = %x[arch].chomp
 $homebrew_patch = "homebrew_x86_universal.patch"
 $current_dir = "#{`pwd`.chomp}"
 $homebrew_path = "#{`brew --repository`.chomp}/"
@@ -31,6 +31,8 @@ end
 def setup_env
   ENV["HOMEBREW_NO_AUTO_UPDATE"] = "1"
   ENV["HOMEBREW_NO_INSTALL_UPGRADE"] = "1"
+  ENV["MACOSX_DEPLOYMENT_TARGET"] = "10.11"
+  ENV["CMAKE_OSX_ARCHITECTURES"] = "x86_64;arm64"
   FileUtils.cd $homebrew_path
   system "git reset --hard HEAD"
   print "Applying Homebrew patch (MACOSX_DEPLOYMENT_TARGET & oldest CPU)\n"
@@ -57,13 +59,13 @@ begin
   end
   setup_env
   return if $only_setup
-  if arch != "arm64"
-    pkgs = ["libpng", "glib"]
-    pkgs.each do |dep|
-      setup_rb dep
-    end
-    print "#{pkgs} rb files prepared\n"
+
+  pkgs = ["libpng", "glib"]
+  pkgs.each do |dep|
+    setup_rb dep
   end
+  print "#{pkgs} rb files prepared\n"
+
 
   deps = "#{`brew deps mpv-wiliwili -n`}".split("\n")
   deps.each do |dep|
@@ -71,33 +73,33 @@ begin
   end
   total = deps.length + 1
 
-  deps.each do |dep|
-    fetch dep
-  end
-  fetch "mpv-wiliwili"
-  print "\n#{total} fetched\n"
+  # deps.each do |dep|
+  #   fetch dep
+  # end
+  # fetch "mpv-wiliwili"
+  # print "\n#{total} fetched\n"
   fetch "glfw"
   install "glfw"
 
-  if $compile_deps
-    print "#{total} packages to be compiled\n"
+  # if $compile_deps
+  #   print "#{total} packages to be compiled\n"
 
-    deps.each do |dep|
-      print "\nCompiling #{dep}\n"
-      install dep
-      total -= 1
-      print "------------------------\n"
-      print "#{dep} has been compiled\n"
-      print "#{total} remained\n"
-      print "------------------------\n"
-      if dep.start_with?("python")
-        print "------------patch_python------------\n"
-        patch_python
-      end
-    end
-  end
+  #   deps.each do |dep|
+  #     print "\nCompiling #{dep}\n"
+  #     install dep
+  #     total -= 1
+  #     print "------------------------\n"
+  #     print "#{dep} has been compiled\n"
+  #     print "#{total} remained\n"
+  #     print "------------------------\n"
+  #     if dep.start_with?("python")
+  #       print "------------patch_python------------\n"
+  #       patch_python
+  #     end
+  #   end
+  # end
 
-  install "mpv-wiliwili"
+  # install "mpv-wiliwili"
 
 ensure
   reset
