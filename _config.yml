@@ -1,3 +1,8 @@
 markdown: kramdown
 kramdown:
   parse_block_html: true
+  syntax_highlighter_opts:
+    span:
+      line_numbers: false
+    block:
+      line_numbers: true
