@@ -3,7 +3,7 @@
 
 <details>
 <summary id="local-switch">
-点击展开
+<label>点击展开</label>
 </summary>
 
 #### Docker
