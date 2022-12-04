@@ -8,7 +8,7 @@ $compile_deps = !$*.find_index("--no-deps")
 $only_setup = $*.find_index("--setup-env")
 $patch_python = $*.find_index("--patch-python")
 
-arcbih = %x[arch].chomp
+arch = %x[arch].chomp
 $homebrew_patch = "homebrew_x86_universal.patch"
 $current_dir = "#{`pwd`.chomp}"
 $homebrew_path = "#{`brew --repository`.chomp}/"

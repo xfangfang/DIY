@@ -1,4 +1,4 @@
-name: Build wiliwili
+name: Build wiliwili (macOS 10.15)
 
 on:
   # push:
