@@ -2,7 +2,11 @@
 本仓库仅供个人测试github各项功能使用
 
 <details>
-<summary id="local-switch">点击展开</summary>
+<summary id="local-switch">
+
+点击展开
+
+</summary>
 
 #### Docker
 
