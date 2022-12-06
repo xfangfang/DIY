@@ -95,7 +95,7 @@ jobs:
         with:
           bundle: wiliwili-Linux-${{ matrix.arch }}-${{ needs.version.outputs.version }}.flatpak
           manifest-path: .flatpak-manifest.yml
-          cache-key: flatpak-builder-${{ github.sha }}
+          cache-key: flatpak-builder-${{ matrix.arch }}-${{ github.sha }}
           arch: ${{ matrix.arch }}
 
       - name: Upload dist
