@@ -75,6 +75,7 @@ jobs:
           update: true
           install: >-
             mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-ca-certificates
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-make
             mingw-w64-x86_64-mpv
@@ -88,6 +89,10 @@ jobs:
           VERSION="${{ needs.version.outputs.version }}"
           DIST_EXE="${{ needs.version.outputs.DIST_EXE }}"
           echo ${VERSION} ${DIST_EXE}
+          
+          BRLS_GLFW="library/borealis/library/lib/extern/glfw/"
+          cmake -P ${BRLS_GLFW}/CMake/GenerateMappings.cmake  ${BRLS_GLFW}/src/mappings.h.in  ${BRLS_GLFW}/src/mappings.h
+
 
           mkdir -p build && pushd build
           cmake .. -G "MinGW Makefiles" -DPLATFORM_DESKTOP=ON -DWIN32_TERMINAL=ON -DCMAKE_BUILD_TYPE=Release
