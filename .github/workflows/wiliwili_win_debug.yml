@@ -71,8 +71,8 @@ jobs:
           
       - name: Update gamepad db
         run: |
-          cmake -P library/borealis/library/lib/extern/glfw//CMake/GenerateMappings.cmake^
-            library/borealis/library/lib/extern/glfw//src/mappings.h.in^
+          cmake -P library/borealis/library/lib/extern/glfw//CMake/GenerateMappings.cmake ^
+            library/borealis/library/lib/extern/glfw//src/mappings.h.in ^
             library/borealis/library/lib/extern/glfw//src/mappings.h
 
       - name: Install dependency
