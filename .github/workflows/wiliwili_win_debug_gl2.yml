@@ -1,0 +1,116 @@
+name: Build wiliwili (Windows debug OpenGL 2.1)
+
+on:
+  workflow_dispatch:
+    inputs:
+      ssh_darwin:
+        description: 'SSH connection to Darwin'
+        required: false
+        default: 'false'
+      ssh_ubuntu:
+        description: 'SSH connection to Ubuntu'
+        required: false
+        default: 'false'
+      release:
+        description: 'Push a new release'
+        required: false
+        default: 'false'
+      version:
+        description: 'Version'
+        required: false
+        default: '0.0.0'
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.info.outputs.version }}
+      standard_version: ${{ steps.info.outputs.standard_version }}
+      DIST_EXE: ${{ steps.info.outputs.DIST_EXE }}
+      DIST_NRO: ${{ steps.info.outputs.DIST_NRO }}
+      DIST_INTEL_DMG: ${{ steps.info.outputs.DIST_INTEL_DMG }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: 'xfangfang/wiliwili'
+
+      - name: Debug version
+        run: |
+          export VERSION=`git rev-parse --short HEAD`
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+
+      - name: Release version
+        if: github.event.inputs.release == 'true' && github.event.inputs.release != 'false' && !cancelled()
+        run: |
+          export VERSION="${{ github.event.inputs.version }}"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+
+      - name: Version
+        id: info
+        env:
+          VERSION: ${{ env.VERSION }}
+        run: |
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "DIST_EXE=wiliwili-Windows-x64-${VERSION}" >> $GITHUB_OUTPUT
+          echo "DIST_NRO=wiliwili-NintendoSwitch-${VERSION}" >> $GITHUB_OUTPUT
+          echo "DIST_INTEL_DMG=wiliwili-macOS-IntelChip-${VERSION}" >> $GITHUB_OUTPUT
+          echo $VERSION
+          echo "${{  github.event.inputs.version }}"
+
+  build-win-x64:
+    needs: [ version ]
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: 'xfangfang/wiliwili'
+          submodules: 'recursive'
+          fetch-depth: 0
+          
+      - name: Update gamepad db
+        run: |
+          cmake -P library/borealis/library/lib/extern/glfw//CMake/GenerateMappings.cmake library/borealis/library/lib/extern/glfw//src/mappings.h.in library/borealis/library/lib/extern/glfw//src/mappings.h
+
+      - name: Install dependency
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-mpv
+            git
+            p7zip
+
+      - name: Build
+        shell: msys2 {0}
+        id: compile
+        run: |
+          VERSION="${{ needs.version.outputs.version }}"
+          DIST_EXE="${{ needs.version.outputs.DIST_EXE }}"
+          echo ${VERSION} ${DIST_EXE}
+
+          mkdir -p build && pushd build
+          cmake .. -G "MinGW Makefiles" -DPLATFORM_DESKTOP=ON -DWIN32_TERMINAL=ON -DCMAKE_BUILD_TYPE=Release -DUSE_GL2=ON
+          mingw32-make wiliwili -j4
+          strip wiliwili.exe
+          ls /mingw64/bin/
+          mkdir wiliwili && mv wiliwili.exe wiliwili && mv resources wiliwili
+          for i in {libwinpthread-1,libgcc_s_seh-1,zlib1,libssh2-1,libstdc++-6,libcrypto-3-x64}; do
+          cp /mingw64/bin/${i}.dll wiliwili
+          done
+          wget https://github.com/xfangfang/wiliwili/releases/download/v0.1.0/mpv-dev-x86_64-20221204-git-4574dd5.7z -O mpv.7z
+          7z e mpv.7z -ompv
+          cp mpv/mpv-2.dll wiliwili/libmpv-2.dll
+          tar -czvf ../${DIST_EXE}.tar.gz wiliwili
+          echo "status=success" >> $GITHUB_OUTPUT
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v3
+        if: steps.compile.outputs.status == 'success'
+        with:
+          name: ${{ needs.version.outputs.DIST_EXE }}
+          path: "${{ needs.version.outputs.DIST_EXE }}.tar.gz"
