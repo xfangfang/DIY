@@ -26,9 +26,7 @@ jobs:
     outputs:
       version: ${{ steps.info.outputs.version }}
       standard_version: ${{ steps.info.outputs.standard_version }}
-      DIST_EXE: ${{ steps.info.outputs.DIST_EXE }}
-      DIST_NRO: ${{ steps.info.outputs.DIST_NRO }}
-      DIST_INTEL_DMG: ${{ steps.info.outputs.DIST_INTEL_DMG }}
+      DIST_EXE_DEBUG: ${{ steps.info.outputs.DIST_EXE_DEBUG }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -52,11 +50,43 @@ jobs:
           VERSION: ${{ env.VERSION }}
         run: |
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "DIST_EXE=wiliwili-Windows-x64-${VERSION}" >> $GITHUB_OUTPUT
-          echo "DIST_NRO=wiliwili-NintendoSwitch-${VERSION}" >> $GITHUB_OUTPUT
-          echo "DIST_INTEL_DMG=wiliwili-macOS-IntelChip-${VERSION}" >> $GITHUB_OUTPUT
+          echo "DIST_EXE_DEBUG=wiliwili-Windows-x64-${VERSION}-debug" >> $GITHUB_OUTPUT
           echo $VERSION
           echo "${{  github.event.inputs.version }}"
+
+  release:
+    needs: [ build-win-x64, version ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+
+      - name: Version
+        run: |
+          echo "DIST_EXE_DEBUG=${{ needs.version.outputs.DIST_EXE_DEBUG }}" >> $GITHUB_ENV
+          echo $GITHUB_ENV
+          ls -lah
+
+      - name: Upload Release
+        if: github.event.inputs.release == 'true' && !cancelled()
+        uses: ncipollo/release-action@v1
+        with:
+          name: wiliwili ${{  github.event.inputs.version }}
+          tag: ${{  github.event.inputs.version }}
+          omitBodyDuringUpdate: true
+          body: This release is built by github-action.
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true
+          artifacts: >
+            ${{ env.DIST_EXE_DEBUG }}/${{ env.DIST_EXE_DEBUG }}.tar.gz
+
+      - name: Upload WeTransfer
+        if: github.event.inputs.release != 'true' && !cancelled()
+        run: |
+          curl -fsSL git.io/file-transfer | sh
+          ./transfer wet -s -p 16 --no-progress \
+            ${{ env.DIST_EXE_DEBUG }}/${{ env.DIST_EXE_DEBUG }}.tar.gz  2>&1 | tee wetransfer.log
+          echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
+          echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
 
   build-win-x64:
     needs: [ version ]
@@ -90,8 +120,8 @@ jobs:
         id: compile
         run: |
           VERSION="${{ needs.version.outputs.version }}"
-          DIST_EXE="${{ needs.version.outputs.DIST_EXE }}"
-          echo ${VERSION} ${DIST_EXE}
+          DIST_EXE_DEBUG="${{ needs.version.outputs.DIST_EXE_DEBUG }}"
+          echo ${VERSION} ${DIST_EXE_DEBUG}
 
           mkdir -p build && pushd build
           cmake .. -G "MinGW Makefiles" -DPLATFORM_DESKTOP=ON -DWIN32_TERMINAL=ON -DCMAKE_BUILD_TYPE=Release
@@ -105,12 +135,12 @@ jobs:
           wget https://github.com/xfangfang/wiliwili/releases/download/v0.1.0/mpv-dev-x86_64-20221204-git-4574dd5.7z -O mpv.7z
           7z e mpv.7z -ompv
           cp mpv/mpv-2.dll wiliwili/libmpv-2.dll
-          tar -czvf ../${DIST_EXE}.tar.gz wiliwili
+          tar -czvf ../${DIST_EXE_DEBUG}.tar.gz wiliwili
           echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Upload dist
         uses: actions/upload-artifact@v3
         if: steps.compile.outputs.status == 'success'
         with:
-          name: ${{ needs.version.outputs.DIST_EXE }}
-          path: "${{ needs.version.outputs.DIST_EXE }}.tar.gz"
+          name: ${{ needs.version.outputs.DIST_EXE_DEBUG }}
+          path: "${{ needs.version.outputs.DIST_EXE_DEBUG }}.tar.gz"
