@@ -90,16 +90,16 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           allowUpdates: true
           artifacts: >
-            ${{ env.DIST_EXE }}.tar.gz
-            ${{ env.DIST_NRO }}.tar.gz
-            ${{ env.DIST_INTEL_DMG }}.dmg
-            ${{ env.DIST_FLATPAK_x86_64 }}.zip
+            ${{ env.DIST_EXE }}/${{ env.DIST_EXE }}.tar.gz
+            ${{ env.DIST_NRO }}/${{ env.DIST_NRO }}.tar.gz
+            ${{ env.DIST_INTEL_DMG }}/${{ env.DIST_INTEL_DMG }}.dmg
+            ${{ env.DIST_FLATPAK_x86_64 }} / ${{ env.DIST_FLATPAK_x86_64 }}.zip
 
       - name: Upload WeTransfer
         if: github.event.inputs.release != 'true' && !cancelled()
         run: |
           curl -fsSL git.io/file-transfer | sh
-          ./transfer wet -s -p 16 --no-progress ${{ env.DIST_EXE }}.tar.gz ${{ env.DIST_NRO }}.tar.gz ${{ env.DIST_INTEL_DMG }}.dmg ${{ env.DIST_FLATPAK_x86_64 }}.zip 2>&1 | tee wetransfer.log
+          ./transfer wet -s -p 16 --no-progress ${{ env.DIST_EXE }}/${{ env.DIST_EXE }}.tar.gz ${{ env.DIST_NRO }}/${{ env.DIST_NRO }}.tar.gz ${{ env.DIST_INTEL_DMG }}/${{ env.DIST_INTEL_DMG }}.dmg ${{ env.DIST_FLATPAK_x86_64 }} / ${{ env.DIST_FLATPAK_x86_64 }}.zip 2>&1 | tee wetransfer.log
           echo "::warning title=访问下方链接免登录下载测试版::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
 
   build-win-x64:
