@@ -66,6 +66,43 @@ jobs:
           echo $VERSION
           echo "${{  github.event.inputs.version }}"
 
+  release:
+    needs: [ build-flatpak, version ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+
+      - name: Version
+        run: |
+          echo "DIST_FLATPAK_X86_64=${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}" >> $GITHUB_ENV
+          echo "DIST_FLATPAK_AARCH64=${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}" >> $GITHUB_ENV
+          echo $GITHUB_ENV
+          ls -lah
+
+      - name: Upload Release
+        if: github.event.inputs.release == 'true' && !cancelled()
+        uses: ncipollo/release-action@v1
+        with:
+          name: wiliwili ${{  github.event.inputs.version }}
+          tag: ${{  github.event.inputs.version }}
+          omitBodyDuringUpdate: true
+          body: This release is built by github-action.
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true
+          artifacts: >
+            ${{ env.DIST_FLATPAK_X86_64 }}/${{ env.DIST_FLATPAK_X86_64 }}.tar.gz
+            ${{ env.DIST_FLATPAK_AARCH64 }}/${{ env.DIST_FLATPAK_AARCH64 }}.tar.gz
+
+      - name: Upload WeTransfer
+        if: github.event.inputs.release != 'true' && !cancelled()
+        run: |
+          curl -fsSL git.io/file-transfer | sh
+          ./transfer wet -s -p 16 --no-progress \
+            ${{ env.DIST_FLATPAK_X86_64 }}/${{ env.DIST_FLATPAK_X86_64 }}.tar.gz \
+            ${{ env.DIST_FLATPAK_AARCH64 }}/${{ env.DIST_FLATPAK_AARCH64 }}.tar.gz  2>&1 | tee wetransfer.log
+          echo "::warning file=wetransfer.com,title=免登录下载::$(cat wetransfer.log | grep https)"
+          echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
+
   build-flatpak:
     needs: [ version ]
     runs-on: ubuntu-latest
