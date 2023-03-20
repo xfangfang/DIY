@@ -74,6 +74,13 @@ jobs:
     steps:
       - uses: actions/download-artifact@v3
 
+      - name: Rename Flatpak
+        run: |
+          mv ${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}/wiliwili-Linux-${{ needs.version.outputs.version }}.flatpak \
+            ${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}/${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}.flatpak
+          mv ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/wiliwili-Linux-${{ needs.version.outputs.version }}.flatpak \
+            ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}.flatpak
+
       - name: Upload Release
         if: github.event.inputs.release == 'true' && !cancelled()
         uses: ncipollo/release-action@v1
@@ -88,8 +95,8 @@ jobs:
             ${{ needs.version.outputs.DIST_EXE }}/${{ needs.version.outputs.DIST_EXE }}.tar.gz
             ${{ needs.version.outputs.DIST_NRO }}/${{ needs.version.outputs.DIST_NRO }}.tar.gz
             ${{ needs.version.outputs.DIST_INTEL_DMG }}/${{ needs.version.outputs.DIST_INTEL_DMG }}.dmg
-            ${{ needs.version.outputs.DIST_FLATPAK_x86_64 }}/${{ needs.version.outputs.DIST_FLATPAK_x86_64 }}.zip
-            ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}.zip
+            ${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}/${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}.flatpak
+            ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}.flatpak
 
       - name: Upload WeTransfer
         if: github.event.inputs.release != 'true' && !cancelled()
@@ -100,7 +107,7 @@ jobs:
             ${{ needs.version.outputs.DIST_EXE }}/${{ needs.version.outputs.DIST_EXE }}.tar.gz \
             ${{ needs.version.outputs.DIST_NRO }}/${{ needs.version.outputs.DIST_NRO }}.tar.gz \
             ${{ needs.version.outputs.DIST_INTEL_DMG }}/${{ needs.version.outputs.DIST_INTEL_DMG }}.dmg \
-            ${{ needs.version.outputs.DIST_FLATPAK_x86_64 }}/${{ needs.version.outputs.DIST_FLATPAK_x86_64 }}.flatpak \
+            ${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}/${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}.flatpak \
             ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}.flatpak 2>&1 | tee wetransfer.log
           echo "::warning title=访问下方链接免登录下载测试版 (有效期至：`date -u +"%F %T" -d "7day"` UTC)::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
 
@@ -280,7 +287,7 @@ jobs:
 
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v5
         with:
-          bundle: wiliwili-Linux-${{ needs.version.outputs.version }}-${{ matrix.arch }}.flatpak
+          bundle: wiliwili-Linux-${{ needs.version.outputs.version }}.flatpak
           manifest-path: .flatpak-manifest.yml
           cache-key: flatpak-builder-${{ github.sha }}
           arch: ${{ matrix.arch }}
