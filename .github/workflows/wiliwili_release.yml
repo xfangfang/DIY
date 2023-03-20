@@ -102,7 +102,7 @@ jobs:
             ${{ needs.version.outputs.DIST_INTEL_DMG }}/${{ needs.version.outputs.DIST_INTEL_DMG }}.dmg \
             ${{ needs.version.outputs.DIST_FLATPAK_x86_64 }}/${{ needs.version.outputs.DIST_FLATPAK_x86_64 }}.flatpak \
             ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}.flatpak 2>&1 | tee wetransfer.log
-          echo "::warning title=访问下方链接免登录下载测试版::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
+          echo "::warning title=访问下方链接免登录下载测试版 (有效期至：`date -u +"%F %T" -d "7day"` UTC)::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
 
   build-win-x64:
     needs: [ version ]

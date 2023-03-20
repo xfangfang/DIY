@@ -90,17 +90,17 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           allowUpdates: true
           artifacts: >
-            ${{ env.DIST_FLATPAK_X86_64 }}/${{ env.DIST_FLATPAK_X86_64 }}.zip
-            ${{ env.DIST_FLATPAK_AARCH64 }}/${{ env.DIST_FLATPAK_AARCH64 }}.zip
+            ${{ env.DIST_FLATPAK_X86_64 }}/${{ env.DIST_FLATPAK_X86_64 }}.flatpak
+            ${{ env.DIST_FLATPAK_AARCH64 }}/${{ env.DIST_FLATPAK_AARCH64 }}.flatpak
 
       - name: Upload WeTransfer
         if: github.event.inputs.release != 'true' && !cancelled()
         run: |
           curl -fsSL git.io/file-transfer | sh
           ./transfer wet -s -p 16 --no-progress \
-            ${{ env.DIST_FLATPAK_X86_64 }}/${{ env.DIST_FLATPAK_X86_64 }}.zip \
-            ${{ env.DIST_FLATPAK_AARCH64 }}/${{ env.DIST_FLATPAK_AARCH64 }}.zip  2>&1 | tee wetransfer.log
-          echo "::warning title=免登录下载::$(cat wetransfer.log | grep https)"
+            ${{ env.DIST_FLATPAK_X86_64 }}/${{ env.DIST_FLATPAK_X86_64 }}.flatpak \
+            ${{ env.DIST_FLATPAK_AARCH64 }}/${{ env.DIST_FLATPAK_AARCH64 }}.flatpak  2>&1 | tee wetransfer.log
+          echo "::warning title=访问下方链接免登录下载测试版 (有效期至：`date -u +"%F %T" -d "7day"` UTC)::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
 
   build-flatpak:
     needs: [ version ]
