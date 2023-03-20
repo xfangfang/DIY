@@ -74,6 +74,7 @@ jobs:
 
       - name: Rename Flatpak
         run: |
+          tree
           mv ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/wiliwili-Linux-${{ needs.version.outputs.version }}.flatpak \
             ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}.flatpak
           mv ${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}/wiliwili-Linux-${{ needs.version.outputs.version }}.flatpak \
@@ -130,7 +131,7 @@ jobs:
           platforms: arm64
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v5
         with:
-          bundle: wiliwili-Linux-${{ matrix.arch }}-${{ needs.version.outputs.version }}.flatpak
+          bundle: wiliwili-Linux-${{ needs.version.outputs.version }}.flatpak
           manifest-path: .flatpak-manifest.yml
           cache-key: flatpak-builder-${{ matrix.arch }}-${{ github.sha }}
           arch: ${{ matrix.arch }}
