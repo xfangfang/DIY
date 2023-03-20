@@ -90,17 +90,17 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           allowUpdates: true
           artifacts: >
-            ${{ env.DIST_FLATPAK_X86_64 }}/${{ env.DIST_FLATPAK_X86_64 }}.tar.gz
-            ${{ env.DIST_FLATPAK_AARCH64 }}/${{ env.DIST_FLATPAK_AARCH64 }}.tar.gz
+            ${{ env.DIST_FLATPAK_X86_64 }}/${{ env.DIST_FLATPAK_X86_64 }}.zip
+            ${{ env.DIST_FLATPAK_AARCH64 }}/${{ env.DIST_FLATPAK_AARCH64 }}.zip
 
       - name: Upload WeTransfer
         if: github.event.inputs.release != 'true' && !cancelled()
         run: |
           curl -fsSL git.io/file-transfer | sh
           ./transfer wet -s -p 16 --no-progress \
-            ${{ env.DIST_FLATPAK_X86_64 }}/${{ env.DIST_FLATPAK_X86_64 }}.tar.gz \
-            ${{ env.DIST_FLATPAK_AARCH64 }}/${{ env.DIST_FLATPAK_AARCH64 }}.tar.gz  2>&1 | tee wetransfer.log
-          echo "::warning file=wetransfer.com,title=免登录下载::$(cat wetransfer.log | grep https)"
+            ${{ env.DIST_FLATPAK_X86_64 }}/${{ env.DIST_FLATPAK_X86_64 }}.zip \
+            ${{ env.DIST_FLATPAK_AARCH64 }}/${{ env.DIST_FLATPAK_AARCH64 }}.zip  2>&1 | tee wetransfer.log
+          echo "::warning title=免登录下载::$(cat wetransfer.log | grep https)"
           echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
 
   build-flatpak:
