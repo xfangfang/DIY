@@ -280,7 +280,7 @@ jobs:
 
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v5
         with:
-          bundle: wiliwili-Linux-${{ needs.version.outputs.version }}.flatpak
+          bundle: wiliwili-Linux-${{ needs.version.outputs.version }}-${{ matrix.arch }}.flatpak
           manifest-path: .flatpak-manifest.yml
           cache-key: flatpak-builder-${{ github.sha }}
           arch: ${{ matrix.arch }}
