@@ -61,8 +61,8 @@ jobs:
           echo "DIST_EXE=wiliwili-Windows-x64-${VERSION}" >> $GITHUB_OUTPUT
           echo "DIST_NRO=wiliwili-NintendoSwitch-${VERSION}" >> $GITHUB_OUTPUT
           echo "DIST_INTEL_DMG=wiliwili-macOS-IntelChip-${VERSION}" >> $GITHUB_OUTPUT
-          echo "DIST_FLATPAK_X86_64=wiliwili-Linux-x86_64-${VERSION}.flatpak" >> $GITHUB_OUTPUT
-          echo "DIST_FLATPAK_AARCH64=wiliwili-Linux-aarch64-${VERSION}.flatpak" >> $GITHUB_OUTPUT
+          echo "DIST_FLATPAK_X86_64=wiliwili-Linux-${VERSION}-x86_64" >> $GITHUB_OUTPUT
+          echo "DIST_FLATPAK_AARCH64=wiliwili-Linux-${VERSION}-aarch64" >> $GITHUB_OUTPUT
           echo $VERSION
           echo "${{  github.event.inputs.version }}"
 
@@ -101,7 +101,6 @@ jobs:
             ${{ env.DIST_FLATPAK_X86_64 }}/${{ env.DIST_FLATPAK_X86_64 }}.zip \
             ${{ env.DIST_FLATPAK_AARCH64 }}/${{ env.DIST_FLATPAK_AARCH64 }}.zip  2>&1 | tee wetransfer.log
           echo "::warning title=免登录下载::$(cat wetransfer.log | grep https)"
-          echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
 
   build-flatpak:
     needs: [ version ]
