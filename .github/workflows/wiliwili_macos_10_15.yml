@@ -103,7 +103,7 @@ jobs:
       - name: install basic deps
         run: |
           brew tap xfangfang/wiliwili
-          brew install create-dmg dylibbundler mpv-wiliwili
+          brew install create-dmg dylibbundler mpv-wiliwili webp
 
       - name: cache for old deps
         id: cache
