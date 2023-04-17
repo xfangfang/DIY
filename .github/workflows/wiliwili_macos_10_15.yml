@@ -62,38 +62,38 @@ jobs:
           echo $VERSION
           echo "${{  github.event.inputs.version }}"
 
-  release:
-    needs: [ build-macos-intel, version ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v2
+  # release:
+  #   needs: [ build-macos-intel, version ]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/download-artifact@v2
 
-      - name: Version
-        run: |
-          echo "DIST_INTEL_DMG=${{ needs.version.outputs.DIST_INTEL_DMG }}" >> $GITHUB_ENV
-          echo $GITHUB_ENV
-          ls -lah
+  #     - name: Version
+  #       run: |
+  #         echo "DIST_INTEL_DMG=${{ needs.version.outputs.DIST_INTEL_DMG }}" >> $GITHUB_ENV
+  #         echo $GITHUB_ENV
+  #         ls -lah
 
-      - name: Upload Release
-        if: github.event.inputs.release == 'true' && !cancelled()
-        uses: ncipollo/release-action@v1
-        with:
-          name: wiliwili ${{  github.event.inputs.version }}
-          tag: ${{  github.event.inputs.version }}
-          omitBodyDuringUpdate: true
-          body: This release is built by github-action.
-          token: ${{ secrets.GITHUB_TOKEN }}
-          allowUpdates: true
-          artifacts: >
-            ${{ env.DIST_INTEL_DMG }}/${{ env.DIST_INTEL_DMG }}.dmg
+  #     - name: Upload Release
+  #       if: github.event.inputs.release == 'true' && !cancelled()
+  #       uses: ncipollo/release-action@v1
+  #       with:
+  #         name: wiliwili ${{  github.event.inputs.version }}
+  #         tag: ${{  github.event.inputs.version }}
+  #         omitBodyDuringUpdate: true
+  #         body: This release is built by github-action.
+  #         token: ${{ secrets.GITHUB_TOKEN }}
+  #         allowUpdates: true
+  #         artifacts: >
+  #           ${{ env.DIST_INTEL_DMG }}/${{ env.DIST_INTEL_DMG }}.dmg
 
-      - name: Upload WeTransfer
-        if: github.event.inputs.release != 'true' && !cancelled()
-        run: |
-          curl -fsSL git.io/file-transfer | sh
-          ./transfer wet -s -p 16 --no-progress \
-            ${{ env.DIST_INTEL_DMG }}/${{ env.DIST_INTEL_DMG }}.dmg 2>&1 | tee wetransfer.log
-          echo "::warning title=免登录下载测试版::$(cat wetransfer.log | grep https)"
+  #     - name: Upload WeTransfer
+  #       if: github.event.inputs.release != 'true' && !cancelled()
+  #       run: |
+  #         curl -fsSL git.io/file-transfer | sh
+  #         ./transfer wet -s -p 16 --no-progress \
+  #           ${{ env.DIST_INTEL_DMG }}/${{ env.DIST_INTEL_DMG }}.dmg 2>&1 | tee wetransfer.log
+  #         echo "::warning title=免登录下载测试版::$(cat wetransfer.log | grep https)"
 
   build-macos-intel:
     needs: [ version ]

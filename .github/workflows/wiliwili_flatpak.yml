@@ -66,43 +66,43 @@ jobs:
           echo $VERSION
           echo "${{  github.event.inputs.version }}"
 
-  release:
-    needs: [ build-flatpak, version ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v3
+  # release:
+  #   needs: [ build-flatpak, version ]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/download-artifact@v3
 
-      - name: Rename Flatpak
-        run: |
-          tree
-          mv ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/wiliwili-Linux-${{ needs.version.outputs.version }}.flatpak \
-            ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}.flatpak
-          mv ${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}/wiliwili-Linux-${{ needs.version.outputs.version }}.flatpak \
-            ${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}/${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}.flatpak
+  #     - name: Rename Flatpak
+  #       run: |
+  #         tree
+  #         mv ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/wiliwili-Linux-${{ needs.version.outputs.version }}.flatpak \
+  #           ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}.flatpak
+  #         mv ${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}/wiliwili-Linux-${{ needs.version.outputs.version }}.flatpak \
+  #           ${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}/${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}.flatpak
 
-      - name: Upload Release
-        if: github.event.inputs.release == 'true' && !cancelled()
-        uses: ncipollo/release-action@v1
-        with:
-          name: wiliwili ${{  github.event.inputs.version }}
-          tag: ${{  github.event.inputs.version }}
-          omitBodyDuringUpdate: true
-          body: This release is built by github-action.
-          token: ${{ secrets.GITHUB_TOKEN }}
-          allowUpdates: true
-          artifacts: >
-            ${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}/${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}.flatpak
-            ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}.flatpak
+  #     - name: Upload Release
+  #       if: github.event.inputs.release == 'true' && !cancelled()
+  #       uses: ncipollo/release-action@v1
+  #       with:
+  #         name: wiliwili ${{  github.event.inputs.version }}
+  #         tag: ${{  github.event.inputs.version }}
+  #         omitBodyDuringUpdate: true
+  #         body: This release is built by github-action.
+  #         token: ${{ secrets.GITHUB_TOKEN }}
+  #         allowUpdates: true
+  #         artifacts: >
+  #           ${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}/${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}.flatpak
+  #           ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}.flatpak
 
-      - name: Upload WeTransfer
-        if: github.event.inputs.release != 'true' && !cancelled()
-        run: |
-          tree
-          curl -fsSL git.io/file-transfer | sh
-          ./transfer wet -s -p 16 --no-progress \
-            ${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}/${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}.flatpak \
-            ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}.flatpak  2>&1 | tee wetransfer.log
-          echo "::warning title=访问下方链接免登录下载测试版 (有效期至：`date -u +"%F %T" -d "7day"` UTC)::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
+  #     - name: Upload WeTransfer
+  #       if: github.event.inputs.release != 'true' && !cancelled()
+  #       run: |
+  #         tree
+  #         curl -fsSL git.io/file-transfer | sh
+  #         ./transfer wet -s -p 16 --no-progress \
+  #           ${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}/${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}.flatpak \
+  #           ${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}/${{ needs.version.outputs.DIST_FLATPAK_AARCH64 }}.flatpak  2>&1 | tee wetransfer.log
+  #         echo "::warning title=访问下方链接免登录下载测试版 (有效期至：`date -u +"%F %T" -d "7day"` UTC)::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
 
   build-flatpak:
     needs: [ version ]
