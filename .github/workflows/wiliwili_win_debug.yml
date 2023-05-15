@@ -19,11 +19,8 @@ on:
         description: 'Version'
         required: false
         default: '0.0.0'
-      build_cache:
-        descrptoin: 'Using cache to acc build'
-        required: false
-        default: 'true'
-
+env:
+  SCCACHE_GHA_ENABLED: "true"
 jobs:
   version:
     runs-on: ubuntu-latest
@@ -121,13 +118,10 @@ jobs:
             mingw-w64-x86_64-libwebp
             git
             p7zip
-            sccache
 
       - name: Build
         shell: msys2 {0}
         id: compile
-        env:
-          SCCACHE_GHA_ENABLED: "${{ github.event.inputs.build_cache }}"
         run: |
           VERSION="${{ needs.version.outputs.version }}"
           DIST_EXE_DEBUG="${{ needs.version.outputs.DIST_EXE_DEBUG }}"
