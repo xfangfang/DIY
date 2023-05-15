@@ -105,6 +105,8 @@ jobs:
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@v0.0.3
+        with:
+          version: "v0.4.2"
 
       - name: Install dependency
         uses: msys2/setup-msys2@v2
@@ -132,8 +134,8 @@ jobs:
           mkdir -p build && pushd build
           cmake .. -G "MinGW Makefiles" -DPLATFORM_DESKTOP=ON \
             -DWIN32_TERMINAL=ON -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_C_COMPILER_LAUNCHER=sccache \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
+            -DCMAKE_C_COMPILER_LAUNCHER=${SCCACHE_PATH} \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=${SCCACHE_PATH}
           mingw32-make wiliwili -j4
           strip wiliwili.exe
           ls /mingw64/bin/
