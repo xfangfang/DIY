@@ -23,6 +23,10 @@ on:
         description: 'Version'
         required: false
         default: '0.0.0'
+      build_cache:
+        descrptoin: 'Using cache to acc build'
+        required: false
+        default: 'true'
 
 jobs:
   version:
@@ -145,6 +149,9 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@v0.0.3
+
       - name: Readme
         run: |
           mkdir -p dist
@@ -162,9 +169,11 @@ jobs:
         env:
           VERSION: ${{ needs.version.outputs.version }}
           DIST_INTEL_DMG: ${{ needs.version.outputs.DIST_INTEL_DMG }}
+          SCCACHE_GHA_ENABLED: "${{ github.event.inputs.build_cache }}"
         run: |
           echo $VERSION $DIST_INTEL_DMG
-          cmake -B build -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release -DMAC_10_15=ON
+          cmake -B build -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release -DMAC_10_15=ON \
+            -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
           make -C build wiliwili.app -j$(nproc)
           mv build/wiliwili.app dist/
           create-dmg --window-pos 200 120 --window-size 800 400 \
