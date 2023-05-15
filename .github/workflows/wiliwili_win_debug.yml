@@ -126,7 +126,7 @@ jobs:
         shell: msys2 {0}
         id: compile
         env:
-          SCCACHE_GHA_ENABLED: {{ github.event.inputs.build_cache }}
+          SCCACHE_GHA_ENABLED: "{{ github.event.inputs.build_cache }}"
         run: |
           VERSION="${{ needs.version.outputs.version }}"
           DIST_EXE_DEBUG="${{ needs.version.outputs.DIST_EXE_DEBUG }}"
