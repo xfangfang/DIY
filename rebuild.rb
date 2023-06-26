@@ -115,6 +115,11 @@ begin
   fetch "webp"
   install "webp"
 
+  if arch != "arm64"
+    fetch "boost"
+    install "boost"
+  end
+
   if $compile_deps
     print "#{total} packages to be compiled\n"
 
