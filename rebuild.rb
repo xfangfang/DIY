@@ -1,12 +1,12 @@
 #!/usr/bin/env ruby
 
 require "fileutils"
+require "pathname"
 
 include FileUtils::Verbose
 
 $compile_deps = !$*.find_index("--no-deps")
 $only_setup = $*.find_index("--setup-env")
-$patch_python = $*.find_index("--patch-python")
 
 arch = %x[arch].chomp
 $homebrew_patch = if arch == "arm64"
@@ -18,14 +18,47 @@ $current_dir = "#{`pwd`.chomp}"
 $homebrew_path = "#{`brew --repository`.chomp}/"
 
 # system "brew tap xfangfang/wiliwili"
-# system "brew install sd python@3.10"
+# system "brew install sd"
 
 def install(package)
   system "brew reinstall #{package} --build-from-source"
 end
 
 def fetch(package)
-  system "brew fetch -s #{package}"
+  system "brew fetch -f -s #{package}"
+end
+
+class FormulaPatcher
+  def initialize(lib)
+    @file_path = `brew edit --print-path #{lib}`.strip
+  end
+
+  def remove_line(ln)
+    lines = Pathname(@file_path).readlines
+    lines.filter! { |line| !line.strip.end_with?(ln) }
+    File.open(@file_path, 'w') { |file| file.write lines.join }
+  end
+
+  def append_after_line(ln, &block)
+    new_ln = block.call
+    lines = Pathname(@file_path).readlines
+    arg_line = lines.index { |l| l.strip.end_with?(ln) }
+    lines.insert(arg_line + 1, new_ln + "\n")
+    File.open(@file_path, 'w') { |file| file.write lines.join }
+  end
+end
+
+def patch_formula(*libs, &block)
+  libs.each do |lib|
+    patcher = FormulaPatcher.new(lib)
+    block.call(patcher)
+    p "Patched #{lib}"
+  end
+end
+
+def livecheck(package)
+  splitted = `brew livecheck rubberband`.split(/:|==>/).map { |x| x.strip }
+  splitted[1] == splitted[2]
 end
 
 def setup_rb(package)
@@ -33,19 +66,15 @@ def setup_rb(package)
 end
 
 def setup_env
+  system "brew update --auto-update"
   ENV["HOMEBREW_NO_AUTO_UPDATE"] = "1"
   ENV["HOMEBREW_NO_INSTALL_UPGRADE"] = "1"
+  ENV["HOMEBREW_NO_INSTALL_CLEANUP"] = "1"
+  ENV["HOMEBREW_NO_INSTALL_FROM_API"] = "1"
   FileUtils.cd $homebrew_path
   system "git reset --hard HEAD"
   print "Applying Homebrew patch (MACOSX_DEPLOYMENT_TARGET & oldest CPU)\n"
   system "git apply #{$current_dir}/#{$homebrew_patch}"
-end
-
-def patch_python
-  file_path = "#{`brew --prefix python@3.10`.chomp}/Frameworks/Python.framework/Versions/3.10/lib/python3.10/distutils/spawn.py"
-  lines = File.readlines(file_path)
-  lines.filter! { |line| !line.end_with?("raise DistutilsPlatformError(my_msg)\n") }
-  File.open(file_path, 'w') { |file| file.write lines.join }
 end
 
 def reset
@@ -54,19 +83,21 @@ def reset
   system "git reset --hard HEAD"
 end
 
+# Begin compilation
+
 begin
-  if $patch_python
-    patch_python
-    return
-  end
   setup_env
   return if $only_setup
   if arch != "arm64"
-    pkgs = ["libpng", "glib"]
-    pkgs.each do |dep|
-      setup_rb dep
+    patch_formula 'libpng', 'glib' do |p|
+      p.append_after_line 'def install' do
+        %q(
+          ENV["CFLAGS"] = "-mmacosx-version-min=10.11"
+          ENV["LDFLAGS"] = "-mmacosx-version-min=10.11"
+          ENV["CXXFLAGS"] = "-mmacosx-version-min=10.11"
+        )
+      end
     end
-    print "#{pkgs} rb files prepared\n"
   end
 
   deps = "#{`brew deps mpv-wiliwili -n`}".split("\n")
@@ -80,13 +111,15 @@ begin
   end
   fetch "mpv-wiliwili"
   print "\n#{total} fetched\n"
-  fetch "glfw"
-  install "glfw"
+
+  fetch webp
+  install webp
 
   if $compile_deps
     print "#{total} packages to be compiled\n"
 
     deps.each do |dep|
+      raise "brew livecheck failed for #{dep}" unless livecheck dep
       print "\nCompiling #{dep}\n"
       install dep
       total -= 1
@@ -94,10 +127,6 @@ begin
       print "#{dep} has been compiled\n"
       print "#{total} remained\n"
       print "------------------------\n"
-      if dep.start_with?("python")
-        print "------------patch_python------------\n"
-        patch_python
-      end
     end
   end
 

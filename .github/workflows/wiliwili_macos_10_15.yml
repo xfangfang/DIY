@@ -23,10 +23,6 @@ on:
         description: 'Version'
         required: false
         default: '0.0.0'
-      build_cache:
-        descrptoin: 'Using cache to acc build'
-        required: false
-        default: 'true'
 
 jobs:
   version:
@@ -107,20 +103,7 @@ jobs:
       - name: install basic deps
         run: |
           brew tap xfangfang/wiliwili
-          brew install create-dmg dylibbundler mpv-wiliwili webp
-
-      - name: cache for old deps
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            /usr/local/Homebrew
-            /usr/local/Cellar
-            /usr/local/Frameworks
-            /usr/local/bin
-            /usr/local/opt
-            /usr/local/lib
-          key: ${{ runner.os }}-wiliwili-r6
+          brew install create-dmg dylibbundler mpv-wiliwili webp sd
 
       - name: install old deps if cache not hit
         shell: zsh {0}
@@ -128,7 +111,6 @@ jobs:
         run: |
           brew tap xfangfang/wiliwili
           brew developer on
-          brew install create-dmg dylibbundler glm sd
           echo $PWD
           wget https://github.com/xfangfang/OpenWrt-DIY/raw/main/homebrew_x86.patch
           wget https://github.com/xfangfang/OpenWrt-DIY/raw/main/rebuild.rb
@@ -148,9 +130,6 @@ jobs:
         env:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@v0.0.3
 
       - name: Readme
         run: |
@@ -172,8 +151,7 @@ jobs:
           SCCACHE_GHA_ENABLED: "${{ github.event.inputs.build_cache }}"
         run: |
           echo $VERSION $DIST_INTEL_DMG
-          cmake -B build -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release -DMAC_10_15=ON \
-            -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
+          cmake -B build -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release -DMAC_10_15=ON
           make -C build wiliwili.app -j$(nproc)
           mv build/wiliwili.app dist/
           create-dmg --window-pos 200 120 --window-size 800 400 \
