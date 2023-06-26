@@ -112,8 +112,8 @@ begin
   fetch "mpv-wiliwili"
   print "\n#{total} fetched\n"
 
-  fetch webp
-  install webp
+  fetch "webp"
+  install "webp"
 
   if $compile_deps
     print "#{total} packages to be compiled\n"
