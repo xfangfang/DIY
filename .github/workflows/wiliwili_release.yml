@@ -181,6 +181,7 @@ jobs:
           xmake --version
       - uses: actions/checkout@v3
         with:
+          repository: 'xfangfang/wiliwili'
           fetch-depth: 0
       - name: pre-repo
         shell: powershell
@@ -351,7 +352,7 @@ jobs:
         id: dep
         if: matrix.arch == 'x86_64' || ( matrix.arch == 'aarch64' && github.event.inputs.arm_flatpak == 'true')
         run: |
-          dnf -y install cmake
+          dnf -y install cmake zstd
           BRLS_GLFW="library/borealis/library/lib/extern/glfw/"
           cmake -P ${BRLS_GLFW}/CMake/GenerateMappings.cmake  ${BRLS_GLFW}/src/mappings.h.in  ${BRLS_GLFW}/src/mappings.h
           echo "FLATPAK_NAME=${FLATPAK_NAME}"  >> $GITHUB_OUTPUT
