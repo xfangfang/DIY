@@ -365,7 +365,7 @@ jobs:
         with:
           platforms: arm64
 
-      - uses: flatpak/flatpak-github-actions/flatpak-builder@v4.1
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v4
         if: matrix.arch == 'x86_64' || ( matrix.arch == 'aarch64' && github.event.inputs.arm_flatpak == 'true')
         with:
           bundle: ${{ steps.dep.outputs.FLATPAK_NAME }}
