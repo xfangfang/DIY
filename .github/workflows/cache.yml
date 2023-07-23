@@ -1,0 +1,40 @@
+name: cache test
+
+on:
+  workflow_dispatch:
+    inputs:
+      ssh_ubuntu:
+        description: 'SSH connection to Ubuntu'
+        required: false
+        default: 'false'
+  push:
+    branches:
+      - fix/flatpak_cache
+jobs:
+  cache-test-str:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache test
+        id: cache-test
+        uses: actions/cache@v3
+        with:
+          path: .flatpak-builder
+          key: wiliwili-flatpak-gl-3e4c6feaf306aeb897d55c1602e3a05ca5c95d87f46f1087b2c608f2b302b66b-x86_64
+
+      - name: made cache
+        if: steps.cache-test.outputs.cache-hit != 'true'
+        run: |
+          mkdir .flatpak-builder
+          echo "hhh" > .flatpak-builder/test
+
+      - name: SSH connection to Actions
+        uses: P3TERX/ssh2actions@v1.0.0
+        if: github.event.inputs.ssh_ubuntu == 'true'
+        env:
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+
+      - name: output
+        run: |
+          ls -lah .flatpak-builder
+          cat .flatpak-builder/test
