@@ -18,14 +18,14 @@ jobs:
         id: cache-test
         uses: actions/cache@v3
         with:
-          path: .flatpak-builder
+          path: .flatpak-builder-another
           key: wiliwili-flatpak-gl-3e4c6feaf306aeb897d55c1602e3a05ca5c95d87f46f1087b2c608f2b302b66b-x86_64
 
       - name: made cache
         if: steps.cache-test.outputs.cache-hit != 'true'
         run: |
-          mkdir .flatpak-builder
-          echo "hhh" > .flatpak-builder/test
+          mkdir .flatpak-builder-another
+          echo "hhh" > .flatpak-builder-another/test
 
       - name: SSH connection to Actions
         uses: P3TERX/ssh2actions@v1.0.0
@@ -36,5 +36,5 @@ jobs:
 
       - name: output
         run: |
-          ls -lah .flatpak-builder
-          cat .flatpak-builder/test
+          ls -lah .flatpak-builder-another
+          cat .flatpak-builder-another/test
