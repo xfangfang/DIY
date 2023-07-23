@@ -380,4 +380,3 @@ jobs:
         run: |
           pwd
           ls -lah
-          tree
