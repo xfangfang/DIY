@@ -96,6 +96,8 @@ jobs:
         run: |
           mv ${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}/wiliwili-Linux-${{ needs.version.outputs.version }}.flatpak \
             ${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}/${{ needs.version.outputs.DIST_FLATPAK_X86_64 }}.flatpak
+          ls -lah
+          tree
 
       - name: Upload Release
         if: github.event.inputs.release == 'true' && !cancelled()
