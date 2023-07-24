@@ -324,6 +324,7 @@ jobs:
       fail-fast: false
     env:
       FLATPAK_NAME: wiliwili-Linux-${{ needs.version.outputs.version }}.flatpak
+      RUNNER_DEBUG: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -353,7 +354,6 @@ jobs:
         if: matrix.arch == 'x86_64' || ( matrix.arch == 'aarch64' && github.event.inputs.arm_flatpak == 'true')
         run: |
           dnf -y install cmake
-          dnf -y remove zstd
           BRLS_GLFW="library/borealis/library/lib/extern/glfw/"
           cmake -P ${BRLS_GLFW}/CMake/GenerateMappings.cmake  ${BRLS_GLFW}/src/mappings.h.in  ${BRLS_GLFW}/src/mappings.h
           echo "FLATPAK_NAME=${FLATPAK_NAME}"  >> $GITHUB_OUTPUT
