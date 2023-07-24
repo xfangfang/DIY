@@ -13,13 +13,15 @@ on:
 jobs:
   cache-test-str:
     runs-on: ubuntu-latest
+    env:
+        RUNNER_DEBUG: 1
     steps:
       - name: Cache test
         id: cache-test
         uses: actions/cache@v3
         with:
           path: .flatpak-builder
-          key: wiliwili-flatpak-gl-3e4c6feaf306aeb897d55c1602e3a05ca5c95d87f46f1087b2c608f2b302b66b-x86_64
+          key: wiliwili-flatpak-gl-3e4c6feaf306aeb897d55c1602e3a05ca5c95d87f46f1087b2c608f2b302b66b-x86_64-x86_64
 
       - name: made cache
         if: steps.cache-test.outputs.cache-hit != 'true'
