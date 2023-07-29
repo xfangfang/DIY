@@ -9,7 +9,7 @@ index 734eccb95..8d0fee78f 100644
 +    self["MACOSX_DEPLOYMENT_TARGET"] = "10.11"
      self["HOMEBREW_ENV"] = "super"
      self["MAKEFLAGS"] ||= "-j#{determine_make_jobs}"
-     self["PATH"] = determine_path
+     self["RUSTFLAGS"] = Hardware.rustflags_target_cpu
 diff --git a/Library/Homebrew/extend/os/mac/hardware.rb b/Library/Homebrew/extend/os/mac/hardware.rb
 index cbe49c842..a280527d4 100644
 --- a/Library/Homebrew/extend/os/mac/hardware.rb
