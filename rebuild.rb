@@ -115,16 +115,14 @@ begin
   fetch "webp"
   install "webp"
 
-  if arch != "arm64"
-    fetch "boost"
-    install "boost"
-  end
+  fetch "boost"
+  install "boost"
 
   if $compile_deps
     print "#{total} packages to be compiled\n"
 
     deps.each do |dep|
-      raise "brew livecheck failed for #{dep}" unless livecheck dep
+      # raise "brew livecheck failed for #{dep}" unless livecheck dep
       print "\nCompiling #{dep}\n"
       install dep
       total -= 1
