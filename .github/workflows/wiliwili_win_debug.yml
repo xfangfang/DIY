@@ -131,6 +131,8 @@ jobs:
 
           ${SCCACHE_PATH} --show-stats
 
+          sed -i "108,110d" CMakeLists.txt
+
           mkdir -p build && pushd build
           cmake .. -G "MinGW Makefiles" -DPLATFORM_DESKTOP=ON \
             -DWIN32_TERMINAL=ON -DCMAKE_BUILD_TYPE=Release \
