@@ -135,7 +135,7 @@ jobs:
 
           mkdir -p build && pushd build
           cmake .. -G "MinGW Makefiles" -DPLATFORM_DESKTOP=ON \
-            -DWIN32_TERMINAL=ON -DCMAKE_BUILD_TYPE=Release \
+            -DWIN32_TERMINAL=ON -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_C_COMPILER_LAUNCHER=${SCCACHE_PATH} \
             -DCMAKE_CXX_COMPILER_LAUNCHER=${SCCACHE_PATH}
           mingw32-make wiliwili -j4
