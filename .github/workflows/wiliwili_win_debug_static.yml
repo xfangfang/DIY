@@ -1,4 +1,4 @@
-name: Build wiliwili (Windows debug)
+name: Build wiliwili (Windows debug static)
 
 on:
   workflow_dispatch:
