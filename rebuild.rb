@@ -16,6 +16,7 @@ $homebrew_patch = if arch == "arm64"
                   end
 $current_dir = "#{`pwd`.chomp}"
 $homebrew_path = "#{`brew --repository`.chomp}/"
+$homebrew_core_path = "#{`brew --repository`.chomp}/Library/Taps/homebrew/homebrew-core/"
 
 # system "brew tap xfangfang/wiliwili"
 # system "brew install sd"
@@ -71,6 +72,8 @@ def setup_env
   ENV["HOMEBREW_NO_INSTALL_UPGRADE"] = "1"
   ENV["HOMEBREW_NO_INSTALL_CLEANUP"] = "1"
   ENV["HOMEBREW_NO_INSTALL_FROM_API"] = "1"
+  FileUtils.cd $homebrew_core_path
+  system "git reset --hard HEAD"
   FileUtils.cd $homebrew_path
   system "git reset --hard HEAD"
   print "Applying Homebrew patch (MACOSX_DEPLOYMENT_TARGET & oldest CPU)\n"
@@ -79,6 +82,8 @@ end
 
 def reset
   return if $only_setup
+  FileUtils.cd $homebrew_core_path
+  system "git reset --hard HEAD"
   FileUtils.cd $homebrew_path
   system "git reset --hard HEAD"
 end
@@ -95,6 +100,15 @@ begin
           ENV["CFLAGS"] = "-mmacosx-version-min=10.11"
           ENV["LDFLAGS"] = "-mmacosx-version-min=10.11"
           ENV["CXXFLAGS"] = "-mmacosx-version-min=10.11"
+        )
+      end
+    end
+    # Only for gnutls 3.8.1
+    # https://github.com/gnutls/gnutls/commit/389729499043bb8b6ba19c0797e93cbdc17ed1a1?diff
+    patch_formula 'gnutls' do |p|
+      p.append_after_line 'def install' do
+        %Q(
+          system "patch", "-Np1", "-i", "#{$current_dir}/gnutls_clang.diff"
         )
       end
     end
