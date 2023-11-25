@@ -131,7 +131,7 @@ jobs:
 
           ${SCCACHE_PATH} --show-stats
 
-          sed -i "108,110d" CMakeLists.txt
+          sed -i "109,111d" CMakeLists.txt
 
           mkdir -p build && pushd build
           cmake .. -G "MinGW Makefiles" -DPLATFORM_DESKTOP=ON \
