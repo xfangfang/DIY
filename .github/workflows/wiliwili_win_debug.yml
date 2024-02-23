@@ -20,7 +20,7 @@ on:
         required: false
         default: '0.0.0'
       terminal:
-        description: 'Unity build'
+        description: 'terminal'
         required: false
         default: 'ON'
         type: choice
@@ -100,6 +100,16 @@ jobs:
     needs: [ version ]
     runs-on: windows-2022
     steps:
+      - name: Test
+        if: inputs.terminal == true
+        run: |
+          echo "hahaha"
+
+      - name: Test2
+        if: inputs.terminal == false
+        run: |
+          echo "hahaha2"
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
