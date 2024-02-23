@@ -101,7 +101,7 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Test
-        if: inputs.terminal == 'false' || inputs.terminal == OFF'
+        if: inputs.terminal == 'false' || inputs.terminal == 'OFF'
         run: |
           echo "hahaha ${{ inputs.unity_build }}"
 
