@@ -19,6 +19,14 @@ on:
         description: 'Version'
         required: false
         default: '0.0.0'
+      terminal:
+        description: 'Unity build'
+        required: false
+        default: 'ON'
+        type: choice
+        options:
+        - ON
+        - OFF
 env:
   SCCACHE_GHA_ENABLED: "true"
 jobs:
@@ -135,7 +143,7 @@ jobs:
 
           mkdir -p build && pushd build
           cmake .. -G "MinGW Makefiles" -DPLATFORM_DESKTOP=ON \
-            -DWIN32_TERMINAL=ON -DCMAKE_BUILD_TYPE=Debug \
+            -DWIN32_TERMINAL=${{ inputs.terminal }} -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_C_COMPILER_LAUNCHER=${SCCACHE_PATH} \
             -DCMAKE_CXX_COMPILER_LAUNCHER=${SCCACHE_PATH}
           mingw32-make wiliwili -j4
