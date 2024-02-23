@@ -101,12 +101,12 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Test
-        if: inputs.unity_build == 'false' || inputs.unity_build = 'OFF'
+        if: inputs.terminal == 'false' || inputs.terminal == OFF'
         run: |
           echo "hahaha ${{ inputs.unity_build }}"
 
       - name: Test2
-        if: inputs.unity_build == 'true' || inputs.unity_build = 'ON'
+        if: inputs.terminal == 'true' || inputs.terminal == 'ON'
         run: |
           echo "hahaha2 ${{ inputs.unity_build }}"
 
