@@ -101,14 +101,14 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Test
-        if: inputs.terminal == true
+        if: inputs.unity_build == 'false' || inputs.unity_build = 'OFF'
         run: |
-          echo "hahaha"
+          echo "hahaha ${{ inputs.unity_build }}"
 
       - name: Test2
-        if: inputs.terminal == false
+        if: inputs.unity_build == 'true' || inputs.unity_build = 'ON'
         run: |
-          echo "hahaha2"
+          echo "hahaha2 ${{ inputs.unity_build }}"
 
       - name: Checkout
         uses: actions/checkout@v3
