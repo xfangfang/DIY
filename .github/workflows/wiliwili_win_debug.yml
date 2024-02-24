@@ -34,7 +34,16 @@ jobs:
       standard_version: ${{ steps.info.outputs.standard_version }}
       DIST_EXE_DEBUG: ${{ steps.info.outputs.DIST_EXE_DEBUG }}
     steps:
-      - name: test
+      - name: test1
+        if: ${{ github.event.inputs.terminal }} == 'true'
+        run: |
+          echo ${{ github.event.inputs.terminal }}
+          if [ ${{ github.event.inputs.terminal }} == 'true' ]; then
+            UNITY_BUILD="ON"
+          fi
+          echo $UNITY_BUILD
+      - name: test2
+        if: ${{ github.event.inputs.terminal }} == 'false'
         run: |
           echo ${{ github.event.inputs.terminal }}
           if [ ${{ github.event.inputs.terminal }} == 'true' ]; then
