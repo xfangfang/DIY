@@ -1,6 +1,7 @@
 name: Build wiliwili (Windows debug)
 
 on:
+  push:
   workflow_dispatch:
     inputs:
       ssh_darwin:
@@ -22,11 +23,7 @@ on:
       terminal:
         description: 'terminal'
         required: false
-        default: 'ON'
-        type: choice
-        options:
-        - ON
-        - OFF
+        default: 'true'
 env:
   SCCACHE_GHA_ENABLED: "true"
 jobs:
@@ -37,6 +34,13 @@ jobs:
       standard_version: ${{ steps.info.outputs.standard_version }}
       DIST_EXE_DEBUG: ${{ steps.info.outputs.DIST_EXE_DEBUG }}
     steps:
+      - name: test
+        run: |
+          echo ${{ github.event.inputs.terminal }}
+          if [ ${{ github.event.inputs.terminal }} == 'true' ]; then
+            UNITY_BUILD="ON"
+          fi
+          echo $UNITY_BUILD
       - name: Checkout
         uses: actions/checkout@v3
         with:
