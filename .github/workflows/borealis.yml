@@ -23,6 +23,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: 'xfangfang/borealis'
+          ref: 'zig'
           submodules: recursive
 
       - name: SSH connection to Actions
