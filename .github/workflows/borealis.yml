@@ -10,39 +10,30 @@ on:
         required: false
         default: 'false'
 jobs:
-  build-desktop:
+  build-android:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: [linux]
-        arch: [ x86_64 ]
-      # Don't fail the whole workflow if one architecture fails
-      fail-fast: false
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           repository: 'xfangfang/borealis'
           ref: 'zig'
           submodules: recursive
-
+      - uses: nttld/setup-ndk@v1
+        id: setup_ndk
+        with:
+          ndk-version: r22b
       - name: SSH connection to Actions
         uses: P3TERX/ssh2actions@v1.0.0
         if: (github.event.inputs.ssh_ubuntu == 'true' && github.event.inputs.ssh_ubuntu  != 'false') || contains(github.event.action, 'ssh_ubuntu')
-
-      - name: Install dependencies
-        run: |
-          sudo apt update -y
-
       - name: Build
         id: build
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release \
-            -DPLATFORM_DESKTOP=ON \
-            -DZIG_TARGET=${{ matrix.arch }}-${{ matrix.os }}-gnu
-          make -C build -j$(nproc)
-          mv borealis_demo borealis-${{ matrix.arch }}-${{ matrix.os }}
-          echo "DEMO=borealis-${{ matrix.arch }}-${{ matrix.os }}" >> $GITHUB_OUTPUT
+          ./build_libromfs_generator.sh
+          cd android-project && ./gradlew assembleDebug
+          output_dir=borealis-android
+          mkdir -p ${output_dir}
+          mv android-project/app/build/outputs/apk/debug/*.apk ${output_dir}
+          echo "DEMO=${output_dir}" >> $GITHUB_OUTPUT
 
       - name: Upload dist
         uses: actions/upload-artifact@v4
