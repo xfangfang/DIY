@@ -10,33 +10,25 @@ on:
         required: false
         default: 'false'
 jobs:
-  build-android:
+  build-psv:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          repository: 'xfangfang/borealis'
-          ref: 'zig'
           submodules: recursive
-      - uses: nttld/setup-ndk@v1
-        id: setup_ndk
-        with:
-          ndk-version: r22b
       - name: SSH connection to Actions
         uses: P3TERX/ssh2actions@v1.0.0
         if: (github.event.inputs.ssh_ubuntu == 'true' && github.event.inputs.ssh_ubuntu  != 'false') || contains(github.event.action, 'ssh_ubuntu')
       - name: Build
-        id: build
         run: |
-          ./build_libromfs_generator.sh
-          cd android-project && ./gradlew assembleDebug
-          output_dir=borealis-android
-          mkdir -p ${output_dir}
-          mv android-project/app/build/outputs/apk/debug/*.apk ${output_dir}
-          echo "DEMO=${output_dir}" >> $GITHUB_OUTPUT
-
+          docker run --rm -v $(pwd):/src/ xfangfang/wiliwili_psv_builder:latest \
+            "mv /usr/local/vitasdk/share/gcc-arm-vita-eabi/samples/hello_world/sce_sys /src/psv/ && \
+             mkdir -p /src/psv/module/ && cp /usr/local/vitasdk/arm-vita-eabi/suprx/*.suprx /src/psv/module/ && \
+             cmake -B build -G Ninja -DPLATFORM_PSV=ON -DUSE_SYSTEM_SDL2=ON -DCMAKE_BUILD_TYPE=Release && \
+             cmake --build build"
       - name: Upload dist
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.build.outputs.DEMO }}
-          path: "${{ steps.build.outputs.DEMO }}"
+          name: borealis-psv
+          path: build/*.vpk
