@@ -78,7 +78,7 @@ jobs:
             ${MINGW_PACKAGE_PREFIX}-gcc \
             ${MINGW_PACKAGE_PREFIX}-ninja
 
-          curl -LO https://github.com/xfangfang/wiliwili/releases/download/v0.1.0/${MINGW_PACKAGE_PREFIX}-mpv-0.36.0-3-any.pkg.tar.zst
+          curl -LO https://github.com/xfangfang/wiliwili/releases/download/v0.1.0/${MINGW_PACKAGE_PREFIX}-mpv-0.36.0-4-any.pkg.tar.zst
           pacman -U --noconfirm *.pkg.tar.zst
       - name: Update gamepad db
         run: |
@@ -86,8 +86,8 @@ jobs:
           cmake -P ${BRLS_GLFW}/CMake/GenerateMappings.cmake ${BRLS_GLFW}/src/mappings.h.in ${BRLS_GLFW}/src/mappings.h
       - name: Build dependency
         run: |
-          curl -sL https://github.com/webmproject/libwebp/archive/v1.3.1.tar.gz | tar zxf - -C /tmp
-          cd /tmp/libwebp-1.3.1
+          curl -sL https://github.com/webmproject/libwebp/archive/v1.3.2.ta.gz | tar zxf - -C /tmp
+          cd /tmp/libwebp-1.3.2
           cmake -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
@@ -106,7 +106,7 @@ jobs:
           cmake --install build
       - name: Build
         run: |
-          cmake -B build -G Ninja \
+          cmake -B build -G Ninja -DUSE_D3D11=ON \
             -DCMAKE_BUILD_TYPE=Release \
             -DPLATFORM_DESKTOP=ON \
             -DWIN32_TERMINAL=ON \
@@ -115,15 +115,16 @@ jobs:
             -DUSE_WIN32_IDN=ON \
             -DCURL_USE_LIBSSH2=OFF \
             -DCURL_USE_LIBPSL=OFF \
+            -DUSE_LIBROMFS=ON \
+            -DMPV_BUNDLE_DLL=${MINGW_PREFIX}/bin/libmpv-2.dll \
+            -DVERSION_BUILD=${{ github.run_number }} \
             -DZLIB_USE_STATIC_LIBS=ON
           cmake --build build
           cd build
-
           strip wiliwili.exe
-          7z a -mx=9 ../${{ needs.version.outputs.DIST_EXE_DEBUG }}.7z wiliwili.exe resources ${MINGW_PREFIX}/bin/libmpv-2.dll
 
       - name: Upload dist
         uses: actions/upload-artifact@v3
         with:
           name: ${{ needs.version.outputs.DIST_EXE_DEBUG }}
-          path: "${{ needs.version.outputs.DIST_EXE_DEBUG }}.7z"
+          path: build/wiliwili.exe
