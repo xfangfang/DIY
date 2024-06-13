@@ -86,7 +86,7 @@ jobs:
           cmake -P ${BRLS_GLFW}/CMake/GenerateMappings.cmake ${BRLS_GLFW}/src/mappings.h.in ${BRLS_GLFW}/src/mappings.h
       - name: Build dependency
         run: |
-          curl -sL https://github.com/webmproject/libwebp/archive/v1.4.0.ta.gz | tar zxf - -C /tmp
+          curl -sL https://github.com/webmproject/libwebp/archive/v1.4.0.tar.gz | tar zxf - -C /tmp
           cd /tmp/libwebp-1.4.0
           cmake -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
