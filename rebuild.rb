@@ -67,7 +67,8 @@ def setup_rb(package)
 end
 
 def setup_env
-  system "brew update --auto-update"
+  #system "brew update --auto-update"
+  ENV["HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK"] = "1"
   ENV["HOMEBREW_NO_AUTO_UPDATE"] = "1"
   ENV["HOMEBREW_NO_INSTALL_UPGRADE"] = "1"
   ENV["HOMEBREW_NO_INSTALL_CLEANUP"] = "1"
@@ -103,15 +104,19 @@ begin
         )
       end
     end
-    # Only for gnutls 3.8.1
-    # https://github.com/gnutls/gnutls/commit/389729499043bb8b6ba19c0797e93cbdc17ed1a1?diff
-    patch_formula 'gnutls' do |p|
-      p.append_after_line 'def install' do
-        %Q(
-          system "patch", "-Np1", "-i", "#{$current_dir}/gnutls_clang.diff"
-        )
-      end
-    end
+    # https://github.com/Homebrew/homebrew-core/blob/master/Formula/s/shaderc.rb
+    # x86_64: shaderc 需要 10.15来构建（或者改代码加入boost filesystem依赖）
+    # 临时解决方法：手动构建，并以 10.11 链接（希望可以正常在低版本下使用，因为我感觉貌似也用不到文件相关的功能，或许可以蒙混过关）
+    # git clone https://github.com/google/shaderc && cd shaderc
+    # git checkout d792558
+    # ./utils/git-sync-deps
+    # export LDFLAGS=-mmacosx-version-min=10.11
+    # cmake -S . -B build -DSHADERC_SKIP_TESTS=ON -DSKIP_GLSLANG_INSTALL=ON -DSKIP_SPIRV_TOOLS_INSTALL=ON -DSKIP_GOOGLETEST_INSTALL=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET="10.15"
+    # cd build && make shaderc_shared -j8
+
+    # 安装
+    # mv /usr/local/Cellar/shaderc/2024.0/lib/libshaderc_shared.1.dylib /usr/local/Cellar/shaderc/2024.0/lib/libshaderc_shared.1.dylib.backup
+    # mv libshaderc/libshaderc_shared.1.dylib /usr/local/Cellar/shaderc/2024.0/lib/libshaderc_shared.1.dylib
   end
 
   deps = "#{`brew deps mpv-wiliwili -n`}".split("\n")
