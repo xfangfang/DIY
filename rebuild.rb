@@ -98,25 +98,21 @@ begin
     patch_formula 'libpng', 'glib' do |p|
       p.append_after_line 'def install' do
         %q(
-          ENV["CFLAGS"] = "-mmacosx-version-min=10.11"
-          ENV["LDFLAGS"] = "-mmacosx-version-min=10.11"
-          ENV["CXXFLAGS"] = "-mmacosx-version-min=10.11"
+          ENV["CFLAGS"] = "-mmacosx-version-min=10.15"
+          ENV["LDFLAGS"] = "-mmacosx-version-min=10.15"
+          ENV["CXXFLAGS"] = "-mmacosx-version-min=10.15"
         )
       end
     end
-    # https://github.com/Homebrew/homebrew-core/blob/master/Formula/s/shaderc.rb
-    # x86_64: shaderc 需要 10.15来构建（或者改代码加入boost filesystem依赖）
-    # 临时解决方法：手动构建，并以 10.11 链接（希望可以正常在低版本下使用，因为我感觉貌似也用不到文件相关的功能，或许可以蒙混过关）
-    # git clone https://github.com/google/shaderc && cd shaderc
-    # git checkout d792558
-    # ./utils/git-sync-deps
-    # export LDFLAGS=-mmacosx-version-min=10.11
-    # cmake -S . -B build -DSHADERC_SKIP_TESTS=ON -DSKIP_GLSLANG_INSTALL=ON -DSKIP_SPIRV_TOOLS_INSTALL=ON -DSKIP_GOOGLETEST_INSTALL=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET="10.15"
-    # cd build && make shaderc_shared -j8
+  end
 
-    # 安装
-    # mv /usr/local/Cellar/shaderc/2024.0/lib/libshaderc_shared.1.dylib /usr/local/Cellar/shaderc/2024.0/lib/libshaderc_shared.1.dylib.backup
-    # mv libshaderc/libshaderc_shared.1.dylib /usr/local/Cellar/shaderc/2024.0/lib/libshaderc_shared.1.dylib
+  patch_formula 'luajit' do |p|
+    p.remove_line 'MacOS.version.to_s if OS.mac?'
+    p.append_after_line 'def install' do
+      %q(
+        ENV["MACOSX_DEPLOYMENT_TARGET"] = "10.15"
+      )
+    end
   end
 
   deps = "#{`brew deps mpv-wiliwili -n`}".split("\n")
@@ -133,9 +129,6 @@ begin
 
   fetch "webp"
   install "webp"
-
-  fetch "boost"
-  install "boost"
 
   if $compile_deps
     print "#{total} packages to be compiled\n"

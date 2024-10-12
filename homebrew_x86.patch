@@ -1,17 +1,17 @@
 diff --git a/Library/Homebrew/extend/ENV/super.rb b/Library/Homebrew/extend/ENV/super.rb
-index 734eccb95..8d0fee78f 100644
+index 89f7ecfa5e..b3540c4b6a 100644
 --- a/Library/Homebrew/extend/ENV/super.rb
 +++ b/Library/Homebrew/extend/ENV/super.rb
-@@ -61,6 +61,7 @@ module Superenv
+@@ -60,6 +60,7 @@ module Superenv
      super
      send(compiler)
- 
-+    self["MACOSX_DEPLOYMENT_TARGET"] = "10.11"
+
++    self["MACOSX_DEPLOYMENT_TARGET"] = "10.15"
      self["HOMEBREW_ENV"] = "super"
      self["MAKEFLAGS"] ||= "-j#{determine_make_jobs}"
-     self["RUSTFLAGS"] = Hardware.rustflags_target_cpu
+     self["RUSTFLAGS"] = Hardware.rustflags_target_cpu(effective_arch)
 diff --git a/Library/Homebrew/extend/os/mac/hardware.rb b/Library/Homebrew/extend/os/mac/hardware.rb
-index cbe49c842..a280527d4 100644
+index d984567c69..2d4d68fa26 100644
 --- a/Library/Homebrew/extend/os/mac/hardware.rb
 +++ b/Library/Homebrew/extend/os/mac/hardware.rb
 @@ -4,6 +4,7 @@
