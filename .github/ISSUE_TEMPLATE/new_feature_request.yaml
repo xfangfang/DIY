@@ -4,8 +4,10 @@ labels: ["feature request"]
 body:
 - type: markdown
   attributes:
-  value: 感谢为 wiliwili 出谋划策～
+    value: 感谢为 wiliwili 出谋划策～
 - type: dropdown
+  validations:
+    required: true
   attributes:
     label: 相关平台
     description: 您要为哪些平台请求的新功能?
@@ -20,28 +22,26 @@ body:
       - macOS
       - 其他
     default: 0
-  validations:
-    required: true
 - type: textarea
-  attributes:
-  label: 描述您想要的解决方案
-  description: 简洁的描述
   validations:
     required: true
+  attributes:
+    label: 描述您想要的解决方案
+    description: 简洁的描述
 - type: textarea
-  attributes:
-  label: 其他同类客户端中有类似的功能
-  description: 如有请发送相关客户端的名称/链接，并简单介绍
-  placeholder: 无
   validations:
     required: true
+  attributes:
+    label: 其他同类客户端中有类似的功能
+    description: 如有请发送相关客户端的名称/链接，并简单介绍
+    placeholder: 无
 - type: textarea
-  attributes:
-  label: 其他补充
-  description: 在此处添加有关功能请求的任何其他信息、截图或视频
-  placeholder: 无
   validations:
     required: true
+  attributes:
+    label: 其他补充
+    description: 在此处添加有关功能请求的任何其他信息、截图或视频
+    placeholder: 无
 - type: checkboxes
   attributes:
     label: 问题确认
