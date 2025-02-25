@@ -21,10 +21,7 @@ body:
       - Windows 桌面/掌机
       - macOS
       - 其他
-    default: 0
 - type: textarea
-  validations:
-    required: true
   attributes:
     label: 描述您想要的解决方案
     description: 简洁的描述
