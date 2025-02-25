@@ -1,0 +1,55 @@
+name: Feature request
+description: Suggest an idea for this project
+labels: ["feature request"]
+body:
+- type: markdown
+  attributes:
+  value: 感谢为 wiliwili 出谋划策～
+- type: dropdown
+  attributes:
+    label: 相关平台
+    description: 您要为哪些平台请求的新功能?
+    options:
+      - 此功能与具体平台无关
+      - Nintendo Switch
+      - PSVita
+      - PS4
+      - Xbox 系列
+      - Linux 桌面/掌机
+      - Windows 桌面/掌机
+      - macOS
+      - 其他
+    default: 0
+  validations:
+    required: true
+- type: textarea
+  attributes:
+  label: 描述您想要的解决方案
+  description: 简洁的描述
+  validations:
+    required: true
+- type: textarea
+  attributes:
+  label: 其他同类客户端中有类似的功能
+  description: 如有请发送相关客户端的名称/链接，并简单介绍
+  placeholder: 无
+  validations:
+    required: true
+- type: textarea
+  attributes:
+  label: 其他补充
+  description: 在此处添加有关功能请求的任何其他信息、截图或视频
+  placeholder: 无
+  validations:
+    required: true
+- type: checkboxes
+  attributes:
+    label: 问题确认
+    description: 请在提交新的issue前，务必确认以下信息
+    options:
+      - label: 阅读了 [反馈问题前要做的事](https://github.com/xfangfang/wiliwili?tab=readme-ov-file#反馈问题前要做的事)
+        required: true
+      - label: 搜索了 [历史 issue](https://github.com/xfangfang/wiliwili/issues?q=is%3Aissue) ，并未发现相同问题
+        required: true
+      - label: 查看了 [应用 wiki](https://github.com/xfangfang/wiliwili/wiki)
+        required: true
